@@ -11,17 +11,42 @@ namespace DotaAPI.Controllers
     {
         MongoClient client = new MongoClient(Constants.data_base);
         IMongoDatabase database;
-        IMongoCollection<TgBotUserInfo> collection;
+        IMongoCollection<TgBotUserInfo> userCollection;
+        IMongoCollection<NotificationInfo> notificationCollection;
         public UserProfileController()
         {
             database = client.GetDatabase("DotaTgBot");
-            collection = database.GetCollection<TgBotUserInfo>("TgBotUsers");
+            userCollection = database.GetCollection<TgBotUserInfo>("TgBotUsers");
+            notificationCollection = database.GetCollection<NotificationInfo>("Notifications");
         }
-
+        [HttpGet("get_notifications")]
+        public IActionResult GetNotifications()
+        {
+            List<NotificationInfo> result = notificationCollection.Find(s=>true).ToList();
+            return Ok(result);
+                /*.Find(s=>s.ChatId == ChatId))*/
+        }
+        [HttpPost("post_notification")]
+        public IActionResult PostNotification(long ChatId,string date,string title)
+        { 
+            NotificationInfo notificationInfo = new NotificationInfo();
+            notificationInfo.ChatId = ChatId;
+            notificationInfo.date = date;
+            notificationInfo.title = title;
+            notificationCollection.InsertOne(notificationInfo);
+            return Ok();
+        }
+        [HttpDelete("delete_notification")]
+        public IActionResult DeleteNotification(long ChatId)
+        {
+            var filter = Builders<NotificationInfo>.Filter.Eq("ChatId", ChatId);
+            notificationCollection.DeleteOne(filter);
+            return Ok();
+        }
         [HttpGet("get_user")]
         public IActionResult GetUser(long ChatId,bool temporary)
         {           
-            return Ok(collection.Find(s=>s.ChatId==ChatId&&s.Temporary == temporary).ToList());
+            return Ok(userCollection.Find(s=>s.ChatId==ChatId&&s.Temporary == temporary).ToList());
 
         }
         [HttpPost("create_user")]
@@ -31,7 +56,7 @@ namespace DotaAPI.Controllers
             user.ChatId = ChatId;
             user.DotaId = DotaId;
             user.Temporary = temporary;
-            collection.InsertOne(user);
+            userCollection.InsertOne(user);
             return Ok();
 
         }
@@ -39,7 +64,7 @@ namespace DotaAPI.Controllers
         public IActionResult DeleteUser( int DotaId,bool temporary)
         {
             var filter = Builders<TgBotUserInfo>.Filter.Eq("DotaId", DotaId)& Builders<TgBotUserInfo>.Filter.Eq("Temporary", temporary);
-            collection.DeleteOne(filter);
+            userCollection.DeleteOne(filter);
             return Ok();
 
         }

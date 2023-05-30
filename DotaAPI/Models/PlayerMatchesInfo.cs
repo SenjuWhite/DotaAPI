@@ -9,6 +9,8 @@
         }
         public class Matches
         {
+            public string player_slot { get; set; }
+            public bool radiant_win { get; set; }
             public string match_id { get; set; }
             public string duration { get; set; }
             public string game_mode { get; set; }

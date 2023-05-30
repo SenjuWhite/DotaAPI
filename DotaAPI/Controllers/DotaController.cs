@@ -28,8 +28,6 @@ namespace DotaAPI.Controllers
             var completions = await openAI.Completions.CreateCompletionAsync(completionRequest);
             var firstCompletion = completions.ToString();
             return Ok(firstCompletion);
-        
-        /*$"{JsonConvert.SerializeObject(firstCompletion)}"*/
     }
         [HttpGet("player")]
         public IActionResult GetPlayer(int id)
