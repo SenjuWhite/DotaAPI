@@ -18,7 +18,7 @@ namespace DotaAPI.Controllers
         {
             Console.OutputEncoding = Encoding.UTF8;
             string question = message;
-            var openAI = new OpenAIAPI("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");
+            var openAI = new OpenAIAPI("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");
             CompletionRequest completionRequest = new CompletionRequest
             {
                 Prompt = question,
